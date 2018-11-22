@@ -5,6 +5,7 @@ php:
   - 5.4
   - 5.5
   - 5.6
+  - 7.2
   - hhvm
 
 matrix:
@@ -13,16 +14,16 @@ matrix:
     - php: hhvm
 
 mysql:
-  database: travis_ci_drupal_module_example_test
+  database: aa1b4bi3ddvt417.c7ium5uwrxyw.us-west-2.rds.amazonaws.com
   username: root
-  encoding: utf8
+  encoding: Pass1234
 
 before_install:
-  - sudo apt-get update > /dev/null
+  - sudo yum update > /dev/null
 
 install:
   # install php packages required for running a web server from drush on php 5.3
-  - sudo apt-get install -y --force-yes php5-cgi php5-mysql
+  - sudo yum install -y --force-yes php5-cgi php5-mysql
 
   # add composer's global bin directory to the path
   # see: https://github.com/drush-ops/drush#install---composer
@@ -49,3 +50,22 @@ before_script:
   - until netstat -an 2>/dev/null | grep '8080.*LISTEN'; do true; done
 
 script: drush test-run 'Travis-CI Drupal Module Example' --uri=http://127.0.0.1:8080
+
+
+
+
+before_deploy: "echo 'ready?'"
+deploy:
+  provider: elasticbeanstalk
+  access_key_id: $ACCESSKEYID
+  secret_access_key:
+    secure: "$SECRETACCESSKEY"
+  region: "us-west-2"  
+  app: "myphp"
+  env: "Myphp-env"
+  bucket_name: "$S3BUCKET"
+  on:
+    branch: master
+  ..
+after_deploy:
+  - ./ebstatus.sh
